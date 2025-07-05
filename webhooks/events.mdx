@@ -1,0 +1,326 @@
+---
+title: 'Events'
+description: 'Documentation about the Nivo webhook events'
+icon: 'webhook'
+---
+
+Below you can check the types of events that are available to be used in your webhooks.
+
+## Upload created
+
+This event is triggered when a new upload is created.
+
+<CodeGroup>
+
+```typescript Types
+export interface UploadCreatedWebhookEvent {
+  trigger: 'upload.created',
+  payload: {
+    id: string;
+    title: string;
+    description: string | null;
+    duration: number;
+    collectionId: string;
+    folderId?: string | null;
+    externalId?: string | null;
+    streamUrl?: string | null;
+    tags: string[];
+    metadata?: Record<string, string> | null;
+  }
+}
+```
+
+```json Example
+{
+  "trigger": "upload.created",
+  "payload": {
+    "id": "23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "title": "Sample video",
+    "description": null,
+    "duration": 286,
+    "collectionId": "81a8d44e-930d-460c-a178-55d571810833",
+    "folderId": null,
+    "externalId": null,
+    "streamUrl": null,
+    "tags": ["courses", "tutorials"],
+    "metadata": {
+      "custom_platform_id": "8B710CBD-47B0-48DA-8CF1-629797572FF8"
+    }
+  }
+}
+```
+
+```typescript Zod Schema
+import { z } from 'zod'
+
+export const uploadCreatedSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  duration: z.number(),
+  collectionId: z.string().nullish(),
+  folderId: z.string().nullish().default(null),
+  externalId: z.string().nullable(),
+  streamUrl: z.string().url().nullable(),
+  tags: z.array(z.string()),
+  metadata: z.record(z.string(), z.string()).nullable(),
+})
+
+export type UploadCreated = z.infer<typeof uploadCreatedSchema>
+```
+
+</CodeGroup>
+
+## Upload updated
+
+This event is triggered when an upload is updated.
+
+<CodeGroup>
+
+```typescript Types
+export interface UploadUpdatedWebhookEvent {
+  trigger: 'upload.updated',
+  payload: {
+    id: string;
+    title: string;
+    description: string | null;
+    duration: number;
+    collectionId: string;
+    folderId?: string | null;
+    externalId?: string | null;
+    streamUrl?: string | null;
+    tags: string[];
+    metadata?: Record<string, string> | null;
+  }
+}
+```
+
+```json Example
+{
+  "trigger": "upload.updated",
+  "payload": {
+    "id": "23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "title": "Sample video",
+    "description": "This is a sample video",
+    "duration": 286,
+    "collectionId": "81a8d44e-930d-460c-a178-55d571810833",
+    "folderId": "9DDCFF93-C38B-4CE2-BB2D-FBAC50A423EA",
+    "externalId": "8B710CBD-47B0-48DA-8CF1-629797572FF8",
+    "streamUrl": "https://nivo.video/stream/23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "tags": ["courses", "tutorials", "sample"],
+    "metadata": {
+      "custom_platform_id": "8B710CBD-47B0-48DA-8CF1-629797572FF8"
+    }
+  }
+}
+```
+
+```typescript Zod Schema
+import { z } from 'zod'
+
+export const uploadUpdatedSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  duration: z.number(),
+  collectionId: z.string().nullish(),
+  folderId: z.string().nullish().default(null),
+  externalId: z.string().nullable(),
+  streamUrl: z.string().url().nullable(),
+  tags: z.array(z.string()),
+  metadata: z.record(z.string(), z.string()).nullable(),
+})
+
+export type UploadCreated = z.infer<typeof uploadCreatedSchema>
+```
+
+</CodeGroup>
+
+## Upload deleted
+
+This event is triggered when an upload is deleted.
+
+<CodeGroup>
+
+```typescript Types
+export interface UploadDeletedWebhookEvent {
+  trigger: 'upload.deleted',
+  payload: {
+    id: string;
+    collectionId: string;
+    metadata?: Record<string, string> | null;
+  }
+}
+```
+
+```json Example
+{
+  "trigger": "upload.deleted",
+  "payload": {
+    "id": "23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "collectionId": "81a8d44e-930d-460c-a178-55d571810833",
+    "metadata": {
+      "custom_platform_id": "8B710CBD-47B0-48DA-8CF1-629797572FF8"
+    }
+  }
+}
+```
+
+```typescript Zod Schema
+import { z } from 'zod'
+
+export const uploadDeletedSchema = z.object({
+  id: z.string().uuid(),
+  collectionId: z.string().nullish(),
+  metadata: z.record(z.string(), z.string()).nullable(),
+})
+
+export type UploadDeleted = z.infer<typeof uploadDeletedSchema>
+```
+
+</CodeGroup>
+
+## Upload transcription created
+
+This event is triggered when a transcription is created for an upload.
+
+<CodeGroup>
+
+```typescript Types
+export interface UploadTranscriptionCreatedWebhookEvent {
+  trigger: 'upload.transcription.created',
+  payload: {
+    id: string;
+    uploadId: string;
+    collectionId: string;
+    metadata: Record<string, string> | null;
+    text: string;
+    segments: {
+      text: string;
+      timestamp: [number, number];
+    }[];
+    metadata?: Record<string, string> | null;
+  }
+}
+```
+
+```json Example
+{
+  "trigger": "upload.transcription.created",
+  "payload": {
+    "id": "23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "uploadId": "23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "collectionId": "81a8d44e-930d-460c-a178-55d571810833",
+    "metadata": {
+      "custom_platform_id": "8B710CBD-47B0-48DA-8CF1-629797572FF8"
+    },
+    "text": "These are the first words of the transcription and these are the rest of the words of the transcription",
+    "segments": [
+      {
+        "text": "These are the first words of the transcription",
+        "timestamp": [0, 4]
+      },
+      {
+        "text": "and these are the rest of the words of the transcription",
+        "timestamp": [4, 10]
+      }
+    }
+  }
+}
+```
+
+```typescript Zod Schema
+import { z } from 'zod'
+
+export const uploadTranscriptionCreatedSchema = z.object({
+  id: z.string().uuid(),
+  uploadId: z.string().uuid(),
+  collectionId: z.string().nullish(),
+  metadata: z.record(z.string(), z.string()).nullable(),
+  text: z.string(),
+  segments: z.array(
+    z.object({
+      text: z.string(),
+      timestamp: z.tuple([z.number(), z.number()]),
+    })
+  ),
+})
+
+export type UploadTranscriptionCreated = z.infer<
+  typeof uploadTranscriptionCreatedSchema
+>
+```
+
+</CodeGroup>
+
+## Tag created
+
+This event is triggered when a new tag is created.
+
+<CodeGroup>
+
+```typescript Types
+export interface TagCreatedWebhookEvent {
+  trigger: 'tag.created',
+  payload: {
+    slug: string;
+  }
+}
+```
+
+```json Example
+{
+  "trigger": "tag.created",
+  "payload": {
+    "slug": "sample-tag"
+  }
+}
+```
+
+```typescript Zod Schema
+import { z } from 'zod'
+
+export const tagCreatedSchema = z.object({
+  slug: z.string(),
+})
+
+export type TagCreated = z.infer<typeof tagCreatedSchema>
+``` 
+
+</CodeGroup>
+
+## Tag deleted
+
+This event is triggered when a tag is deleted.
+
+<CodeGroup>
+
+```typescript Types
+export interface TagDeletedWebhookEvent {
+  trigger: 'tag.deleted',
+  payload: {
+    slug: string;
+  }
+}
+```
+
+```json Example
+{
+  "trigger": "tag.deleted",
+  "payload": {
+    "slug": "sample-tag"
+  }
+}
+```
+
+```typescript Zod Schema
+import { z } from 'zod'
+
+export const tagDeletedSchema = z.object({
+  slug: z.string(),
+})
+
+export type TagDeleted = z.infer<typeof tagDeletedSchema>
+```
+
+</CodeGroup>

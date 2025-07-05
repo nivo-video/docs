@@ -1,0 +1,48 @@
+---
+title: 'Introduction'
+description: 'Documentation about the Nivo webhooks'
+---
+
+## Introduction
+
+Webhooks are used to receive events from Nivo. You can use webhooks to receive events like when a video is uploaded, a transcription is created, etc.
+
+All webhooks are sent using HTTP `POST` requests.
+
+### Example payload
+
+Below you can check an example payload for a `upload.created` webhook event.
+
+```json Example payload
+{
+  "trigger": "upload.created",
+  "payload": {
+    "id": "23a8e2ba-ca40-4ed0-ab0a-fe0847c1fbf5",
+    "title": "Sample video",
+    "description": null,
+    "duration": 286,
+    "collectionId": "81a8d44e-930d-460c-a178-55d571810833",
+    "folderId": null,
+    "externalId": null,
+    "streamUrl": null,
+    "tags": ["courses", "tutorials"],
+    "metadata": {
+      "custom_platform_id": "8B710CBD-47B0-48DA-8CF1-629797572FF8"
+    }
+  }
+}
+```
+
+## Signature verification
+
+All webhooks are signed using a HTTP header called `Nivo-Signature`. This header contains a JWT that is signed using the secret key present in the webhook list inside Nivo dashboard.
+
+```json Example HTTP headers
+{
+  "Nivo-Signature": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmNDgzZTgzNi1mMzRlLTQ1NjgtYjBhOS0zN2VkOWVlNGNiMjYiLCJleHAiOjE3MzYyNzY3NjIsImlzcyI6Im5pdm8iLCJzdWIiOiJodHRwczovL2JhZC1hbGxpZ2F0b3ItNDQud2ViaG9vay5jb29sIn0.t4Auv7rKjEmN-4oXQb4kuWIV2uN0wo8b0S2-nWb6S0Q"
+}
+```
+
+## Retries
+
+Webhooks are retried 3 times with an exponential backoff. After 3 retries, the webhook is considered failed and will not be retried again.
