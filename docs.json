@@ -94,5 +94,9 @@
       "x": "https://x.com/nivo-video",
       "github": "https://github.com/nivo-video"
     }
+  },
+  "thumbnails": {
+    "appearance": "dark",
+    "background": "/share-image.png"
   }
 }
