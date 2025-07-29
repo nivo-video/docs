@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/api/upload": {
+    "/upload": {
       "post": {
         "summary": "Create Upload Request",
         "description": "Creates a new upload request to process a media file from a URL. The file will be processed asynchronously.",
