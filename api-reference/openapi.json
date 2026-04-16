@@ -185,7 +185,7 @@
             },
             "style": "form",
             "explode": true,
-            "description": "Repeat `tags=slug` for multiple values, or use a comma-separated list. Tag slugs are scoped to your organization. OR semantics: videos that have any of the listed tags. Empty values are ignored. If every slug is unknown, the response is 400."
+            "description": "Tag slug per query key; repeat the parameter for multiple slugs (e.g. `tags=foo&tags=bar`). Same semantics as an array in `URLSearchParams`. Slugs are scoped to your organization. OR semantics across listed tags. Empty values are ignored. Unknown slugs yield 400."
           },
           {
             "name": "page_index",
