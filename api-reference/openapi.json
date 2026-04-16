@@ -447,7 +447,7 @@
       },
       "VideoSearchItem": {
         "type": "object",
-        "description": "Upload (video) row as returned by the search API (camelCase, aligned with Drizzle schema field names).",
+        "description": "Upload (video) as returned by the search API (camelCase). Internal identifiers (`authorId`, `collectionId`, `organizationId`), storage keys, batch/order fields, and transcription-regeneration fields are not included.",
         "properties": {
           "id": {
             "type": "string",
@@ -459,37 +459,11 @@
           "title": {
             "type": "string"
           },
-          "storageKey": {
-            "type": "string",
-            "nullable": true
-          },
           "description": {
             "type": "string",
             "nullable": true
           },
-          "uploadOrder": {
-            "type": "integer",
-            "nullable": true
-          },
           "folderId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "uploadBatchId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "collectionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "organizationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "authorId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -518,10 +492,6 @@
           "sizeInBytes": {
             "type": "integer"
           },
-          "subtitlesStorageKey": {
-            "type": "string",
-            "nullable": true
-          },
           "language": {
             "type": "string"
           },
@@ -535,13 +505,6 @@
             "additionalProperties": {
               "type": "string"
             },
-            "nullable": true
-          },
-          "transcriptionRegenerationStatus": {
-            "type": "string"
-          },
-          "transcriptionRegenerationError": {
-            "type": "string",
             "nullable": true
           },
           "createdAt": {

@@ -4,3 +4,5 @@ openapi: 'GET /videos/search'
 ---
 
 Search processed videos inside a **collection** using optional title text, folder, and tag slugs. Use the same API key authentication as the upload endpoint.
+
+Each video object excludes internal tenant identifiers (`authorId`, `collectionId`, `organizationId`), R2 storage keys, upload batch metadata (`uploadBatchId`, `uploadOrder`), and transcription regeneration status fields; see the OpenAPI schema for the exact response shape.
