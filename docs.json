@@ -37,7 +37,8 @@
           {
             "group": "Endpoints",
             "pages": [
-              "api-reference/endpoint/create-upload-request"
+              "api-reference/endpoint/create-upload-request",
+              "api-reference/endpoint/search-videos"
             ]
           }
         ]

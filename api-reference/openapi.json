@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Upload Request API",
+    "title": "Nivo public API",
     "version": "1.0.0",
-    "description": "API for creating upload requests to process media files from URLs"
+    "description": "Public API for Nivo: upload requests from URLs, and searching videos within a collection."
   },
   "servers": [
     {
@@ -132,6 +132,182 @@
           }
         }
       }
+    },
+    "/videos/search": {
+      "get": {
+        "summary": "Search videos",
+        "description": "Search uploads in a collection using optional text (`q`) on the video title (`ILIKE`, so `%` and `_` in `q` are wildcards), optional `folder_id`, and optional tag **slugs** (OR semantics). Requires `collection_id` for the collection to search. Authenticates with the same API key as other v1 routes.",
+        "operationId": "searchVideos",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Collection to search within (must belong to the organization for the API key)."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Case-insensitive substring match on the video title. `%` and `_` act as SQL LIKE wildcards."
+          },
+          {
+            "name": "folder_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Optional folder UUID. Unknown or out-of-collection folders yield an empty `videos` array (not 404)."
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "Repeat `tags=slug` for multiple values, or use a comma-separated list. Tag slugs are scoped to your organization. OR semantics: videos that have any of the listed tags. Empty values are ignored. If every slug is unknown, the response is 400."
+          },
+          {
+            "name": "page_index",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Zero-based page index."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "description": "Page size (1–100)."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["title", "duration", "size_in_bytes"]
+            },
+            "description": "Optional sort field. When omitted, results are ordered by `created_at` descending."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "asc"
+            },
+            "description": "Sort direction when `sort_by` is set. Default `asc`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoSearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed or unknown tag slug(s)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnknownTagSlugsResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Missing or invalid API key",
+                    "value": {
+                      "message": "Unauthorized."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collection not found for this API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "collection_not_found": {
+                    "summary": "Unknown or other-tenant collection",
+                    "value": {
+                      "message": "Collection not found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -236,6 +412,164 @@
               "url": ["Invalid url"],
               "collection_id": ["Invalid uuid"]
             }
+          }
+        }
+      },
+      "UnknownTagSlugsResponse": {
+        "type": "object",
+        "required": ["message", "invalid_slugs"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Unknown tag slug(s)."
+          },
+          "invalid_slugs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Slugs that did not match any tag for your organization."
+          }
+        }
+      },
+      "VideoSearchAuthor": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "VideoSearchItem": {
+        "type": "object",
+        "description": "Upload (video) row with snake_case keys as returned by the search API.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "storage_key": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "upload_order": {
+            "type": "integer",
+            "nullable": true
+          },
+          "folder_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "upload_batch_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "author_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "external_provider_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_stream_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "hls_playlist_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "processed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "size_in_bytes": {
+            "type": "integer"
+          },
+          "subtitles_storage_key": {
+            "type": "string",
+            "nullable": true
+          },
+          "language": {
+            "type": "string"
+          },
+          "requested_deletion_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "transcription_regeneration_status": {
+            "type": "string"
+          },
+          "transcription_regeneration_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "author": {
+            "$ref": "#/components/schemas/VideoSearchAuthor"
+          }
+        }
+      },
+      "VideoSearchResponse": {
+        "type": "object",
+        "required": ["videos", "page_count", "amount_of_uploads"],
+        "properties": {
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VideoSearchItem"
+            }
+          },
+          "page_count": {
+            "type": "integer",
+            "description": "Total pages for the current page_size."
+          },
+          "amount_of_uploads": {
+            "type": "integer",
+            "description": "Total number of matching videos (distinct uploads)."
           }
         }
       }
