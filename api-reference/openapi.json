@@ -136,7 +136,7 @@
     "/videos/search": {
       "get": {
         "summary": "Search videos",
-        "description": "Search uploads in a collection using optional text (`q`) on the video title (`ILIKE`, so `%` and `_` in `q` are wildcards), optional `folder_id`, and optional tag **slugs** (OR semantics). Requires `collection_id` for the collection to search. Authenticates with the same API key as other v1 routes.",
+        "description": "Search uploads in a collection using optional text (`q`) on the video title (`ILIKE`, so `%` and `_` in `q` are wildcards), optional `folder_id`, and optional tag **slugs** (OR semantics). Requires `collection_id` for the collection to search. Authenticates with the same API key as other v1 routes. JSON responses use **camelCase** property names (same convention as the upload endpoint).",
         "operationId": "searchVideos",
         "security": [
           {
@@ -417,13 +417,13 @@
       },
       "UnknownTagSlugsResponse": {
         "type": "object",
-        "required": ["message", "invalid_slugs"],
+        "required": ["message", "invalidSlugs"],
         "properties": {
           "message": {
             "type": "string",
             "example": "Unknown tag slug(s)."
           },
-          "invalid_slugs": {
+          "invalidSlugs": {
             "type": "array",
             "items": {
               "type": "string"
@@ -447,7 +447,7 @@
       },
       "VideoSearchItem": {
         "type": "object",
-        "description": "Upload (video) row with snake_case keys as returned by the search API.",
+        "description": "Upload (video) row as returned by the search API (camelCase, aligned with Drizzle schema field names).",
         "properties": {
           "id": {
             "type": "string",
@@ -459,7 +459,7 @@
           "title": {
             "type": "string"
           },
-          "storage_key": {
+          "storageKey": {
             "type": "string",
             "nullable": true
           },
@@ -467,65 +467,65 @@
             "type": "string",
             "nullable": true
           },
-          "upload_order": {
+          "uploadOrder": {
             "type": "integer",
             "nullable": true
           },
-          "folder_id": {
+          "folderId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "upload_batch_id": {
+          "uploadBatchId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "collection_id": {
+          "collectionId": {
             "type": "string",
             "format": "uuid"
           },
-          "organization_id": {
+          "organizationId": {
             "type": "string",
             "format": "uuid"
           },
-          "author_id": {
+          "authorId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "external_provider_id": {
+          "externalProviderId": {
             "type": "string",
             "nullable": true
           },
-          "external_status": {
+          "externalStatus": {
             "type": "string",
             "nullable": true
           },
-          "external_stream_url": {
+          "externalStreamUrl": {
             "type": "string",
             "nullable": true
           },
-          "hls_playlist_url": {
+          "hlsPlaylistUrl": {
             "type": "string",
             "nullable": true
           },
-          "processed_at": {
+          "processedAt": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "size_in_bytes": {
+          "sizeInBytes": {
             "type": "integer"
           },
-          "subtitles_storage_key": {
+          "subtitlesStorageKey": {
             "type": "string",
             "nullable": true
           },
           "language": {
             "type": "string"
           },
-          "requested_deletion_at": {
+          "requestedDeletionAt": {
             "type": "string",
             "format": "date-time",
             "nullable": true
@@ -537,14 +537,14 @@
             },
             "nullable": true
           },
-          "transcription_regeneration_status": {
+          "transcriptionRegenerationStatus": {
             "type": "string"
           },
-          "transcription_regeneration_error": {
+          "transcriptionRegenerationError": {
             "type": "string",
             "nullable": true
           },
-          "created_at": {
+          "createdAt": {
             "type": "string",
             "format": "date-time"
           },
@@ -555,7 +555,7 @@
       },
       "VideoSearchResponse": {
         "type": "object",
-        "required": ["videos", "page_count", "amount_of_uploads"],
+        "required": ["videos", "pageCount", "amountOfUploads"],
         "properties": {
           "videos": {
             "type": "array",
@@ -563,11 +563,11 @@
               "$ref": "#/components/schemas/VideoSearchItem"
             }
           },
-          "page_count": {
+          "pageCount": {
             "type": "integer",
             "description": "Total pages for the current page_size."
           },
-          "amount_of_uploads": {
+          "amountOfUploads": {
             "type": "integer",
             "description": "Total number of matching videos (distinct uploads)."
           }
